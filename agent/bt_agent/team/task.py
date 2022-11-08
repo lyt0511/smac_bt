@@ -25,20 +25,36 @@ class Team():
             children=[
                 py_trees.composites.Sequence(
                     children=[
+                        cond.CanEvade(self.namespace),
+                        action.CalcEvadeDirection(self.namespace),
+                        action.Move(self.namespace)
+                    ]
+                ),
+                # kite ver 1: use kite node
+                # py_trees.composites.Sequence(
+                #     children=[
+                #         cond.CanKite(self.namespace),
+                #         action.Kite(self.namespace)
+                #     ]
+                # ),
+                # kite ver 2: use evade node
+                py_trees.composites.Sequence(
+                    children=[
+                        cond.CanKite(self.namespace),
+                        action.CalcEvadeDirection(self.namespace),
+                        action.Move(self.namespace)
+                    ]
+                ),
+                py_trees.composites.Sequence(
+                    children=[
                         cond.CanAttack(self.namespace),
                         action.Attack(self.namespace)
                     ]
                 ),
                 py_trees.composites.Sequence(
                     children=[
-                        cond.CanKite(self.namespace),
-                        action.Kite(self.namespace)
-                    ]
-                ),
-                py_trees.composites.Sequence(
-                    children=[
                         cond.CanMove(self.namespace),
-                        action.Moving(self.namespace)
+                        action.Move(self.namespace)
                     ]
                 )
             ]

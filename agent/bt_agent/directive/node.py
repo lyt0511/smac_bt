@@ -7,6 +7,8 @@ def register_gb_keys(self):
     self.gb.register_key('avail_actions', access=py_trees.common.Access.WRITE)
     self.gb.register_key('group_dict', access=py_trees.common.Access.WRITE)
     self.gb.register_key('evade_hp', access=py_trees.common.Access.WRITE)
+    self.gb.register_key('kite_hp', access=py_trees.common.Access.WRITE)
+    self.gb.register_key('under_attack', access=py_trees.common.Access.WRITE)
 
 def init_gb_keys(self):
     self.gb.obs = []
@@ -15,6 +17,8 @@ def init_gb_keys(self):
     self.gb.action = {}
     self.gb.group_dict = {}
     self.gb.evade_hp = 0
+    self.gb.kite_hp = 0
+    self.gb.under_attack = []
 
 def register_eb_keys(self):
     self.eb.register_key('n_agents', access=py_trees.common.Access.WRITE)
@@ -24,6 +28,7 @@ def register_eb_keys(self):
     self.eb.register_key('unit_type_bits', access=py_trees.common.Access.WRITE)
     self.eb.register_key('move_feat_size', access=py_trees.common.Access.WRITE)
     self.eb.register_key('obs_ally_feat_size', access=py_trees.common.Access.WRITE)
+    self.eb.register_key('obs_agent_hp_id', access=py_trees.common.Access.WRITE)    
     self.eb.register_key('state_ally_feat_size', access=py_trees.common.Access.WRITE)
     self.eb.register_key('state_ally_x_id', access=py_trees.common.Access.WRITE)
     self.eb.register_key('state_ally_y_id', access=py_trees.common.Access.WRITE)
@@ -49,6 +54,7 @@ def init_eb_keys(self):
     self.eb.move_feat_size = 0
 
     self.eb.obs_ally_feat_size = 0 
+    self.eb.obs_agent_hp_id = 0 
 
     self.eb.state_ally_feat_size = 0
     self.eb.state_ally_x_id = 0
