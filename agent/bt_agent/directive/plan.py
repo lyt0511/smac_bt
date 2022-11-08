@@ -93,7 +93,7 @@ class Plan():
 
     def update_bb(self):
         self.gb.evade_hp = 0.10
-        self.gb.evade_hp = 0.24
+        self.gb.kite_hp = 0.24
 
         self.gb.under_attack = [False for _ in range(self.args.n_agents)]
 
