@@ -11,6 +11,11 @@ class CanEvade(Node):
     
     def update(self):
         state = self.gb.state
+        # agent dead
+        for idx in self.bb.group:
+            if state[idx*self.eb.state_ally_feat_size] == 0:
+                return py_trees.common.Status.FAILURE
+
         # 1 see anemy, 2 hp < evade hp, and is 3 under attack can evade
         if self.bb.target_visible == -1:
             return py_trees.common.Status.FAILURE
@@ -45,6 +50,11 @@ class CanKite(Node):
     
     def update(self):
         state = self.gb.state
+        # agent dead
+        for idx in self.bb.group:
+            if state[idx*self.eb.state_ally_feat_size] == 0:
+                return py_trees.common.Status.FAILURE
+
         for idx in self.bb.group:
             # hp < kite_hp then can kite
             # print ('{} agent hp: {}'.format(idx, state[idx*self.eb.state_ally_feat_size]))
@@ -61,6 +71,11 @@ class CanAttack(Node):
 
     def update(self):
         state = self.gb.state
+        # agent dead
+        for idx in self.bb.group:
+            if state[idx*self.eb.state_ally_feat_size] == 0:
+                return py_trees.common.Status.FAILURE
+
         for idx in self.bb.group:
             # hp < kite_hp then judge whether to kite
             # print ('{} agent hp: {}'.format(idx, state[idx*self.eb.state_ally_feat_size]))
@@ -86,9 +101,14 @@ class CanMove(Node):
             return py_trees.common.Status.FAILURE
         
         state = self.gb.state
+        # agent dead
         for idx in self.bb.group:
-            if state[idx*self.eb.state_ally_feat_size] < self.gb.evade_hp:
+            if state[idx*self.eb.state_ally_feat_size] == 0:
                 return py_trees.common.Status.FAILURE
+
+        # for idx in self.bb.group:
+        #     if state[idx*self.eb.state_ally_feat_size] < self.gb.evade_hp:
+        #         return py_trees.common.Status.FAILURE
 
         # defatul move to east
         self.bb.move_direction = 'e'
