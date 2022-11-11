@@ -92,11 +92,7 @@ class Plan():
         return actions
 
     def update_bb(self):
-        self.gb.evade_hp = 0.10
-        self.gb.kite_hp = 0.24
-
-        self.gb.under_attack = [False for _ in range(self.args.n_agents)]
-
+        # environment blackboard
         self.eb.n_agents = self.args.n_agents
         self.eb.n_enemies = self.args.n_enemies
 
@@ -128,6 +124,21 @@ class Plan():
         self.eb.move_south_id = 3
         self.eb.move_east_id = 4
         self.eb.move_west_id = 5
+
+        # global blackboard
+        self.gb.evade_hp = 0.10
+        self.gb.evade_hp = 0.24
+
+        self.gb.under_attack = [False for _ in range(self.args.n_agents)]
+
+                
+        self.gb.move_id = {
+            'e': self.eb.move_east_id,
+            'w': self.eb.move_west_id,
+            'n': self.eb.move_north_id,
+            's': self.eb.move_south_id,
+            'N': self.eb.stop_id
+        }
 
     def update_attack_target(self):
         # get the nearest enemy (Todo: get all enemies?)

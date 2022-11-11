@@ -7,20 +7,10 @@ import pdb
 class Move(Node):
     def __init__(self, namespace):
         super().__init__(namespace)
-        self.move_id = {}
 
     def update(self):
-        if len(self.move_id) == 0:            
-            self.move_id = {
-                'e': self.eb.move_east_id,
-                'w': self.eb.move_west_id,
-                'n': self.eb.move_north_id,
-                's': self.eb.move_south_id,
-                'N': self.eb.stop_id
-            }
-
         move_direction = self.bb.move_direction
-        move_action_id = self.move_id[move_direction]
+        move_action_id = self.gb.move_id[move_direction]
         avail_actions = self.gb.avail_actions
         group_actions = []
         for idx in self.bb.group:
@@ -32,8 +22,25 @@ class Move(Node):
                 # must reset the move direction in black board
                 self.bb.move_direction = 'N'
             else:       
-                # stop     
-                self.gb.action[idx] = self.eb.stop_id     
+                # move policy when metting wall    
+                # Todo : at corner, then move to center 
+                if sum(avail_actions[idx][2:6]) >= 2:
+                    self.gb.action[idx] = self.eb.stop_id 
+                # metting one wall, move to orthogonal direction  
+                state = self.gb.state              
+                pos_x = state[idx*self.eb.state_ally_feat_size + self.eb.state_ally_x_id]
+                pos_y = state[idx*self.eb.state_ally_feat_size + self.eb.state_ally_y_id]
+                if move_direction == 'e' or move_direction == 'w':
+                    if pos_y >= 0:
+                        self.gb.action[idx] = self.eb.move_south_id  
+                    else:
+                        self.gb.action[idx] = self.eb.move_north_id
+                else:
+                    if pos_x >= 0:
+                        self.gb.action[idx] = self.eb.move_west_id  
+                    else:
+                        self.gb.action[idx] = self.eb.move_east_id
+                       
                 # group_actions.append(self.eb.stop_id)
 
         return py_trees.common.Status.SUCCESS
