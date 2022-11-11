@@ -1,6 +1,15 @@
 # SMAC BT-Agent
 SMAC BT-Agent is an agent framework based on the behaviour tree in the SMAC environment.
 
+## Features
+- [ ] Moving after meeting walls optimization
+- [ ] Evading direction optimization
+- [ ] Attacking during evading policy oprimization
+- [ ] Attacking policy optimization
+
+- [ ] Coordinate moving
+- [ ] exploration policy
+
 ## Installation
 
 ## SMAC environment rule instruction
