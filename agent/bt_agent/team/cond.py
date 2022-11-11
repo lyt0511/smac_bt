@@ -85,10 +85,10 @@ class CanMove(Node):
         if self.bb.target != -1:
             return py_trees.common.Status.FAILURE
         
-        state = self.gb.state
-        for idx in self.bb.group:
-            if state[idx*self.eb.state_ally_feat_size] < self.gb.evade_hp:
-                return py_trees.common.Status.FAILURE
+        # state = self.gb.state
+        # for idx in self.bb.group:
+        #     if state[idx*self.eb.state_ally_feat_size] < self.gb.evade_hp:
+        #         return py_trees.common.Status.FAILURE
 
         # defatul move to east
         self.bb.move_direction = 'e'
