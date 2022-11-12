@@ -87,7 +87,7 @@ class Plan():
             print("{}".format(py_trees.display.unicode_tree(self.team[i].root, show_status=True)))
         
         # for debug
-        # input()
+        input()
 
         return actions
 
@@ -126,8 +126,8 @@ class Plan():
         self.eb.move_west_id = 5
 
         # global blackboard
-        self.gb.evade_hp = 0.10
-        self.gb.evade_hp = 0.24
+        self.gb.evade_hp = 0
+        self.gb.kite_hp = 0.24
 
         self.gb.under_attack = [False for _ in range(self.args.n_agents)]
 
@@ -151,6 +151,14 @@ class Plan():
             canatt_idx = [idx_base for idx_base in idx_bases]
             dis_idx = [idx_base+1 for idx_base in idx_bases]
 
+            
+            hp_idx = [idx_base+4 for idx_base in idx_bases]
+            enemy_hpsp = agent_obs[hp_idx]
+            if self.eb.shield_bits_ally > 0:
+                sp_idx = [idx_base+5 for idx_base in idx_bases]
+                enemy_sp = agent_obs[sp_idx]
+                enemy_hpsp += enemy_sp
+
             enemy_canatt = agent_obs[canatt_idx]
 
             # if enemy_canatt is empty, ith team's target must be set to -1
@@ -158,12 +166,17 @@ class Plan():
             if enemy_canatt.sum() == 0:
                 self.team[i].bb.target = -1
                 continue
+            
+            # 1. sort target enemy by distance
+            # enemy_dis = agent_obs[dis_idx]
+            # enemy_dis_tuple = [(j,dis) for j,dis in enumerate(enemy_dis.tolist())]
+            # target_sort = sorted(enemy_dis_tuple, key=lambda x:x[1])
 
-            enemy_dis = agent_obs[dis_idx]
-            enemy_dis_tuple = [(j,dis) for j,dis in enumerate(enemy_dis.tolist())]
-            dis_sort = sorted(enemy_dis_tuple, key=lambda x:x[1])
+            # 2. sort target enemy by hp(+sp)
+            enemy_hpsp_tuple = [(j,hpsp) for j,hpsp in enumerate(enemy_hpsp.tolist())]
+            target_sort = sorted(enemy_hpsp_tuple, key=lambda x:x[1])
 
-            for j, _ in dis_sort:
+            for j, _ in target_sort:
                 if enemy_canatt[j] == 1:
                     self.team[i].bb.target = j
                     break
