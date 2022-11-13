@@ -45,7 +45,10 @@ class Plan():
         #     ]
         # )
 
-        self.team = [task.Team(i) for i in range(self.args.n_agents)]
+        # simple assignment for 2s3z, 2 long 3 short
+        self.team = []
+        self.team += [task.Team(i, 'long') for i in range(2)]
+        self.team += [task.Team(i, 'short') for i in range(2, 5)]
 
     def update_ally_info(self):
         self.update_attack_target()

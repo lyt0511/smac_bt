@@ -66,8 +66,9 @@ class CanKite(Node):
 
 
 class CanAttack(Node):
-    def __init__(self, namespace):
+    def __init__(self, namespace, unit_mode):
         super().__init__(namespace)
+        self.unit_mode = unit_mode
 
     def update(self):
         state = self.gb.state
@@ -76,12 +77,14 @@ class CanAttack(Node):
             if state[idx*self.eb.state_ally_feat_size] == 0:
                 return py_trees.common.Status.FAILURE
 
-        for idx in self.bb.group:
-            # hp < kite_hp then judge whether to kite
-            # print ('{} agent hp: {}'.format(idx, state[idx*self.eb.state_ally_feat_size]))
-            if state[idx*self.eb.state_ally_feat_size] < self.gb.kite_hp:                
-                if self.bb.kite_action_type != 'move':
-                    return py_trees.common.Status.FAILURE
+        # only long-hand agent needs to kite
+        if self.unit_mode == 'long':
+            for idx in self.bb.group:
+                # hp < kite_hp then judge whether to kite
+                # print ('{} agent hp: {}'.format(idx, state[idx*self.eb.state_ally_feat_size]))
+                if state[idx*self.eb.state_ally_feat_size] < self.gb.kite_hp:                
+                    if self.bb.kite_action_type != 'move':
+                        return py_trees.common.Status.FAILURE
         
         if self.bb.target != -1:
             # refer to kite action, set the kite action type to attack

@@ -49,7 +49,7 @@ class Team():
                     ),
                     py_trees.composites.Sequence(
                         children=[
-                            cond.CanAttack(self.namespace),
+                            cond.CanAttack(self.namespace, unit_mode),
                             action.Attack(self.namespace)
                         ]
                     ),
@@ -66,7 +66,7 @@ class Team():
                 children=[
                     py_trees.composites.Sequence(
                         children=[
-                            cond.CanAttack(self.namespace),
+                            cond.CanAttack(self.namespace, unit_mode),
                             action.Attack(self.namespace)
                         ]
                     ),
