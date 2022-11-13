@@ -175,10 +175,8 @@ class CalcEvadeDirection(Node):
         for idx in self.bb.group:             
             pos_x = state[idx*self.eb.state_ally_feat_size + self.eb.state_ally_x_id]
             pos_y = state[idx*self.eb.state_ally_feat_size + self.eb.state_ally_y_id]
-            e_pos_x = state[(idx+1)*self.eb.state_ally_feat_size+\
-                                target*self.eb.state_enemy_feat_size+self.eb.state_enemy_x_id]
-            e_pos_y = state[(idx+1)*self.eb.state_ally_feat_size+\
-                                target*self.eb.state_enemy_feat_size+self.eb.state_enemy_y_id]
+            e_pos_x = self.bb.target_visible_center_pos[0]
+            e_pos_y = self.bb.target_visible_center_pos[1]
             # delta_x value: positive - target at east, negative -  target at west
             # delta_y value: positive - target at north, negative - target at south
             delta_x = e_pos_x - pos_x 

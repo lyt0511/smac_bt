@@ -223,6 +223,29 @@ class Plan():
                     self.team[i].bb.target_visible = j
                     break
 
+            # calculate the center pos of all visible enemies for evade and kite direction
+            
+            pos_x = self.gb.state[i*self.eb.state_ally_feat_size + self.eb.state_ally_x_id]
+            pos_y = self.gb.state[i*self.eb.state_ally_feat_size + self.eb.state_ally_y_id]
+            e_pos_x = 0
+            e_pos_y = 0
+            e_cnt = 0
+
+            for j, dis in dis_sort:
+                if dis > 0:
+                    e_pos_x += self.gb.state[self.eb.n_agents*self.eb.state_ally_feat_size+\
+                                j*self.eb.state_enemy_feat_size+self.eb.state_enemy_x_id]
+                    e_pos_y += self.gb.state[self.eb.n_agents*self.eb.state_ally_feat_size+\
+                                j*self.eb.state_enemy_feat_size+self.eb.state_enemy_y_id]
+                    e_cnt += 1
+
+            if e_cnt != 0:
+                e_c_pos_x = e_pos_x / e_cnt
+                e_c_pos_y = e_pos_y / e_cnt
+                self.team[i].bb.target_visible_center_pos = [e_c_pos_x, e_c_pos_y]
+            else:
+                self.team[i].bb.target_visible_center_pos = []
+
 
     def update_ally_under_attack(self):
         # get the nearest enemy (Todo: get all enemies?)
