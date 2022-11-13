@@ -138,9 +138,9 @@ class Attack(Node):
                 # out of attack range, move towards the target
                 pos_x = state[idx*self.eb.state_ally_feat_size + self.eb.state_ally_x_id]
                 pos_y = state[idx*self.eb.state_ally_feat_size + self.eb.state_ally_y_id]
-                e_pos_x = state[(idx+1)*self.eb.state_ally_feat_size+\
+                e_pos_x = state[self.eb.n_agents*self.eb.state_ally_feat_size+\
                                     target*self.eb.state_enemy_feat_size+self.eb.state_enemy_x_id]
-                e_pos_y = state[(idx+1)*self.eb.state_ally_feat_size+\
+                e_pos_y = state[self.eb.n_agents*self.eb.state_ally_feat_size+\
                                     target*self.eb.state_enemy_feat_size+self.eb.state_enemy_y_id]
                 # delta_x value: positive - target at east, negative -  target at west
                 # delta_y value: positive - target at north, negative - target at south
@@ -216,9 +216,9 @@ class Kite(Node):
                 else:                    
                     pos_x = state[idx*self.eb.state_ally_feat_size + self.eb.state_ally_x_id]
                     pos_y = state[idx*self.eb.state_ally_feat_size + self.eb.state_ally_y_id]
-                    e_pos_x = state[(idx+1)*self.eb.state_ally_feat_size+\
+                    e_pos_x = state[self.eb.n_agents*self.eb.state_ally_feat_size+\
                                         target*self.eb.state_enemy_feat_size+self.eb.state_enemy_x_id]
-                    e_pos_y = state[(idx+1)*self.eb.state_ally_feat_size+\
+                    e_pos_y = state[self.eb.n_agents*self.eb.state_ally_feat_size+\
                                         target*self.eb.state_enemy_feat_size+self.eb.state_enemy_y_id]
                     # delta_x value: positive - target at east, negative -  target at west
                     # delta_y value: positive - target at north, negative - target at south
