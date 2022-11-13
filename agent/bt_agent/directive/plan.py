@@ -168,18 +168,26 @@ class Plan():
                 continue
             
             # 1. sort target enemy by distance
-            # enemy_dis = agent_obs[dis_idx]
-            # enemy_dis_tuple = [(j,dis) for j,dis in enumerate(enemy_dis.tolist())]
-            # target_sort = sorted(enemy_dis_tuple, key=lambda x:x[1])
+            enemy_dis = agent_obs[dis_idx]
+            enemy_dis_tuple = [(j,dis) for j,dis in enumerate(enemy_dis.tolist())]
+            dis_sort = sorted(enemy_dis_tuple, key=lambda x:x[1])
 
             # 2. sort target enemy by hp(+sp)
             enemy_hpsp_tuple = [(j,hpsp) for j,hpsp in enumerate(enemy_hpsp.tolist())]
-            target_sort = sorted(enemy_hpsp_tuple, key=lambda x:x[1])
+            hpsp_sort = sorted(enemy_hpsp_tuple, key=lambda x:x[1])
 
-            for j, _ in target_sort:
-                if enemy_canatt[j] == 1:
-                    self.team[i].bb.target = j
-                    break
+            # long-hand agent attack the enemy with lowest hpsp
+            if self.team[i].unit_mode == 'long':
+                for j, _ in hpsp_sort:
+                    if enemy_canatt[j] == 1:
+                        self.team[i].bb.target = j
+                        break
+            # short-hand agent attack the nearest enemy
+            elif self.team[i].unit_mode == 'short':
+                for j, _ in dis_sort:
+                    if enemy_canatt[j] == 1:
+                        self.team[i].bb.target = j
+                        break
 
             # pdb.set_trace()
 
