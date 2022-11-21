@@ -44,6 +44,10 @@ def register_eb_keys(self):
     self.eb.register_key('move_south_id', access=py_trees.common.Access.WRITE)
     self.eb.register_key('move_east_id', access=py_trees.common.Access.WRITE)
     self.eb.register_key('move_west_id', access=py_trees.common.Access.WRITE)
+    self.eb.register_key('map_width', access=py_trees.common.Access.WRITE)
+    self.eb.register_key('map_height', access=py_trees.common.Access.WRITE)
+    self.eb.register_key('area_width', access=py_trees.common.Access.WRITE)
+    self.eb.register_key('area_height', access=py_trees.common.Access.WRITE)
 
 def init_eb_keys(self):
     self.eb.n_agents = 0
@@ -74,6 +78,12 @@ def init_eb_keys(self):
     self.eb.move_south_id = 0
     self.eb.move_east_id = 0
     self.eb.move_west_id = 0
+        
+    # 2s3z - (32,32) (28,28)
+    self.eb.map_width = 32
+    self.eb.map_height = 32
+    self.eb.area_width = 28
+    self.eb.area_height = 28
 
 # def register_keys(self):
 #     self.bb.register_key

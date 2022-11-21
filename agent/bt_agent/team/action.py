@@ -1,6 +1,7 @@
 import py_trees
 import numpy as np
 from agent.bt_agent.team.node import Node
+from util.find_path import Map_grid
 
 import pdb
 
@@ -60,10 +61,14 @@ class Move_Queue(Node):
             self.action_pt.append(-1)
             self.action_finish.append(False)
 
+        map_width = self.eb.map_width
+        map_height = self.eb.map_height
+        self.map_grid = Map_grid(map_width, map_height)
+
     def update(self):
         avail_actions = self.gb.avail_actions
 
-        if self.action_pt.sum < 0:
+        if sum(self.action_pt) < 0:
             self.target_pos = self.bb.move_queue_target_pos
 
         # judge if pointer reach the aciont queue rear
@@ -75,11 +80,19 @@ class Move_Queue(Node):
                 self.action_finish[idx] = True
 
         def calc_move_pos_actions(src_pos, tar_pos):
-            # ============Todo===================
-            # 计算两个坐标的距离
-            # 计算每移动一步前进的坐标数
-            # 生成动作
-            return 
+            # version 1: A* 算法计算两个坐标之间的路径和动作
+            # state中的坐标是经过处理的相对坐标，所以要反处理
+            center_pos_x = self.eb.map_width / 2
+            center_pos_y = self.eb.map_height / 2
+
+            src_x = int(src_pos[0] * self.eb.area_width + center_pos_x)
+            src_y = int(src_pos[1] * self.eb.area_height + center_pos_y)
+            tar_x = int(tar_pos[0] * self.eb.area_width)
+            tar_y = int(tar_pos[1] * self.eb.area_height)
+
+            print (src_x, src_y, tar_x, tar_y)
+
+            return self.map_grid.path_finder.find_path(self.map_grid.grid, src_x, src_y, tar_x, tar_y)
 
         state = self.gb.state
         for i, idx in enumerate(self.bb.group):
@@ -94,13 +107,15 @@ class Move_Queue(Node):
                 # calc pos actions and step the first action
                 agent_pos = (pos_x, pos_y)
                 self.action_queue[i] = calc_move_pos_actions(agent_pos, self.target_pos)
+                
+                print (self.action_queue[i])
                 self.action_pt[i] += 1
 
                 self.gb.action[idx] = self.action_queue[i][self.action_pt[i]]
                 self.action_pt[i] += 1
 
                 # only one action in action queue then reset action queue and pointer
-                reach_action_rear(self.action_queue[i], self.action_pt[i], i)
+                reach_action_rear(self, self.action_queue[i], self.action_pt[i], i)
             else:
                 # step following actions, if reach at the last aciton then reset action queue and pointer
                 self.gb.action[idx] = self.action_queue[i][self.action_pt[i]]

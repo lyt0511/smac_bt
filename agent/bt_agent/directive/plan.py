@@ -86,11 +86,11 @@ class Plan():
                 continue
         
         print ('===================================================')
-        for i in range(5):
+        for i in range(2):
             print("{}".format(py_trees.display.unicode_tree(self.team[i].root, show_status=True)))
         
         # for debug
-        input()
+        # input()
 
         return actions
 
@@ -113,11 +113,11 @@ class Plan():
         # ally - (hp,mp,x,y,shield,unitype)
         self.eb.state_ally_feat_size = 4 + self.args.shield_bits_ally + self.args.unit_type_bits
         self.eb.state_ally_x_id = 2
-        self.eb.state_ally_x_id = 3
+        self.eb.state_ally_y_id = 3
         # enemy - (hp,x,y,shield,unitype)
         self.eb.state_enemy_feat_size = 3 + self.args.shield_bits_enemy + self.args.unit_type_bits
         self.eb.state_enemy_x_id = 1
-        self.eb.state_enemy_x_id = 2        
+        self.eb.state_enemy_y_id = 2        
 
         self.eb.none_attack_bits = 6
         # action id
@@ -142,6 +142,9 @@ class Plan():
             's': self.eb.move_south_id,
             'N': self.eb.stop_id
         }
+
+        for i in range(self.eb.n_agents):
+            self.team[i].bb.move_queue_target_pos = [0.1,0.9]
 
     def update_attack_target(self):
         # get the nearest enemy (Todo: get all enemies?)
