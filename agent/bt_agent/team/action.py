@@ -196,7 +196,7 @@ class CalcEvadeDirection(Node):
             # delta_y value: positive - target at north, negative - target at south
             delta_x = e_pos_x - pos_x 
             delta_y = e_pos_y - pos_y
-            if abs(delta_x) > abs(delta_y):
+            if abs(delta_x) < abs(delta_y):
                 if delta_x < 0:
                     self.bb.move_direction = 'e'
                 else:    
@@ -239,7 +239,7 @@ class Kite(Node):
                     # delta_y value: positive - target at north, negative - target at south
                     delta_x = e_pos_x - pos_x 
                     delta_y = e_pos_y - pos_y
-                    if abs(delta_x) > abs(delta_y):
+                    if abs(delta_x) < abs(delta_y):
                         if delta_x < 0:
                             self.gb.action[idx] = self.eb.move_east_id
                             # group_actions.append(self.eb.move_east_id)
