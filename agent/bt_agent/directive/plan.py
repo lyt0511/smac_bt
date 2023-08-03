@@ -45,7 +45,10 @@ class Plan():
         #     ]
         # )
 
-        self.team = [task.Team(i) for i in range(self.args.n_agents)]
+        # simple assignment for 2s3z, 2 long 3 short
+        self.team = []
+        self.team += [task.Team(i, 'long') for i in range(2)]
+        self.team += [task.Team(i, 'short') for i in range(2, 5)]
 
     def update_ally_info(self):
         self.update_attack_target()
@@ -83,7 +86,7 @@ class Plan():
                 continue
         
         print ('===================================================')
-        for i in range(5):
+        for i in range(2):
             print("{}".format(py_trees.display.unicode_tree(self.team[i].root, show_status=True)))
         
         # for debug
@@ -92,11 +95,7 @@ class Plan():
         return actions
 
     def update_bb(self):
-        self.gb.evade_hp = 0.10
-        self.gb.evade_hp = 0.24
-
-        self.gb.under_attack = [False for _ in range(self.args.n_agents)]
-
+        # environment blackboard
         self.eb.n_agents = self.args.n_agents
         self.eb.n_enemies = self.args.n_enemies
 
@@ -114,11 +113,11 @@ class Plan():
         # ally - (hp,mp,x,y,shield,unitype)
         self.eb.state_ally_feat_size = 4 + self.args.shield_bits_ally + self.args.unit_type_bits
         self.eb.state_ally_x_id = 2
-        self.eb.state_ally_x_id = 3
+        self.eb.state_ally_y_id = 3
         # enemy - (hp,x,y,shield,unitype)
         self.eb.state_enemy_feat_size = 3 + self.args.shield_bits_enemy + self.args.unit_type_bits
         self.eb.state_enemy_x_id = 1
-        self.eb.state_enemy_x_id = 2        
+        self.eb.state_enemy_y_id = 2        
 
         self.eb.none_attack_bits = 6
         # action id
@@ -128,6 +127,24 @@ class Plan():
         self.eb.move_south_id = 3
         self.eb.move_east_id = 4
         self.eb.move_west_id = 5
+
+        # global blackboard
+        self.gb.evade_hp = 0
+        self.gb.kite_hp = 0.24
+
+        self.gb.under_attack = [False for _ in range(self.args.n_agents)]
+
+                
+        self.gb.move_id = {
+            'e': self.eb.move_east_id,
+            'w': self.eb.move_west_id,
+            'n': self.eb.move_north_id,
+            's': self.eb.move_south_id,
+            'N': self.eb.stop_id
+        }
+
+        for i in range(self.eb.n_agents):
+            self.team[i].bb.move_queue_target_pos = [0.1,0.9]
 
     def update_attack_target(self):
         # get the nearest enemy (Todo: get all enemies?)
@@ -140,6 +157,14 @@ class Plan():
             canatt_idx = [idx_base for idx_base in idx_bases]
             dis_idx = [idx_base+1 for idx_base in idx_bases]
 
+            
+            hp_idx = [idx_base+4 for idx_base in idx_bases]
+            enemy_hpsp = agent_obs[hp_idx]
+            if self.eb.shield_bits_ally > 0:
+                sp_idx = [idx_base+5 for idx_base in idx_bases]
+                enemy_sp = agent_obs[sp_idx]
+                enemy_hpsp += enemy_sp
+
             enemy_canatt = agent_obs[canatt_idx]
 
             # if enemy_canatt is empty, ith team's target must be set to -1
@@ -147,15 +172,28 @@ class Plan():
             if enemy_canatt.sum() == 0:
                 self.team[i].bb.target = -1
                 continue
-
+            
+            # 1. sort target enemy by distance
             enemy_dis = agent_obs[dis_idx]
             enemy_dis_tuple = [(j,dis) for j,dis in enumerate(enemy_dis.tolist())]
             dis_sort = sorted(enemy_dis_tuple, key=lambda x:x[1])
 
-            for j, _ in dis_sort:
-                if enemy_canatt[j] == 1:
-                    self.team[i].bb.target = j
-                    break
+            # 2. sort target enemy by hp(+sp)
+            enemy_hpsp_tuple = [(j,hpsp) for j,hpsp in enumerate(enemy_hpsp.tolist())]
+            hpsp_sort = sorted(enemy_hpsp_tuple, key=lambda x:x[1])
+
+            # long-hand agent attack the enemy with lowest hpsp
+            if self.team[i].unit_mode == 'long':
+                for j, _ in hpsp_sort:
+                    if enemy_canatt[j] == 1:
+                        self.team[i].bb.target = j
+                        break
+            # short-hand agent attack the nearest enemy
+            elif self.team[i].unit_mode == 'short':
+                for j, _ in dis_sort:
+                    if enemy_canatt[j] == 1:
+                        self.team[i].bb.target = j
+                        break
 
             # pdb.set_trace()
 
@@ -187,6 +225,29 @@ class Plan():
                 if dis > 0:
                     self.team[i].bb.target_visible = j
                     break
+
+            # calculate the center pos of all visible enemies for evade and kite direction
+            
+            pos_x = self.gb.state[i*self.eb.state_ally_feat_size + self.eb.state_ally_x_id]
+            pos_y = self.gb.state[i*self.eb.state_ally_feat_size + self.eb.state_ally_y_id]
+            e_pos_x = 0
+            e_pos_y = 0
+            e_cnt = 0
+
+            for j, dis in dis_sort:
+                if dis > 0:
+                    e_pos_x += self.gb.state[self.eb.n_agents*self.eb.state_ally_feat_size+\
+                                j*self.eb.state_enemy_feat_size+self.eb.state_enemy_x_id]
+                    e_pos_y += self.gb.state[self.eb.n_agents*self.eb.state_ally_feat_size+\
+                                j*self.eb.state_enemy_feat_size+self.eb.state_enemy_y_id]
+                    e_cnt += 1
+
+            if e_cnt != 0:
+                e_c_pos_x = e_pos_x / e_cnt
+                e_c_pos_y = e_pos_y / e_cnt
+                self.team[i].bb.target_visible_center_pos = [e_c_pos_x, e_c_pos_y]
+            else:
+                self.team[i].bb.target_visible_center_pos = []
 
 
     def update_ally_under_attack(self):

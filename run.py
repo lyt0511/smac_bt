@@ -27,8 +27,7 @@ if __name__ == '__main__':
     args = SN()
 
     env = env_REGISTRY["sc2"](**env_args)
-    # agent = BT_Agent(args)
-    
+    # agent = BT_Agent(args) 
     env_info = env.get_env_info()
     args.n_agents = env_info["n_agents"]
     args.n_actions = env_info["n_actions"]
@@ -44,6 +43,8 @@ if __name__ == '__main__':
     # while (ep < args.max_episode):
     while (ep < 100):
         env.reset()
+        # print  the width and height of the map
+        # print (env.map_x, env.map_y)
         agent.reset()
 
         run(env,agent)
