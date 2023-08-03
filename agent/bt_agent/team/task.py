@@ -56,7 +56,7 @@ class Team():
                     py_trees.composites.Sequence(
                         children=[
                             cond.CanMove(self.namespace),
-                            action.Move_Queue(self.namespace)
+                            action.Move(self.namespace)
                         ]
                     )
                 ]

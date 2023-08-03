@@ -3,15 +3,19 @@ import numpy as np
 from agent.bt_agent.team.node import Node
 from util.find_path import Map_grid
 
+from agent.bt_agent.action.move import move_action
+from agent.bt_agent.action.attack import attack_action
+
 import pdb
 
 class Move(Node):
     def __init__(self, namespace):
         super().__init__(namespace)
+        self.move_action = move_action()
 
     def update(self):
-        move_direction = self.bb.move_direction
-        move_action_id = self.gb.move_id[move_direction]
+        move_direction = self.bb.move_direction        
+        move_action_id = self.move_action.move_act_id(move_direction)
         avail_actions = self.gb.avail_actions
         group_actions = []
         for idx in self.bb.group:
@@ -138,16 +142,18 @@ class Move_Queue(Node):
 class Attack(Node):
     def __init__(self, namespace):
         super().__init__(namespace)
+        self.attack_action = attack_action()
     
     def update(self):
         target = self.bb.target
         group_actions = []
         avail_actions = self.gb.avail_actions
         state = self.gb.state
+        attack_action_id = self.attack_action.attack_act_id(target)
         for idx in self.bb.group:
             if avail_actions[idx][target+self.eb.none_attack_bits] == 1:
                 # attack target (id = target id + self.eb.none_attack_bits (noop stop n s e w))
-                self.gb.action[idx] = target+self.eb.none_attack_bits
+                self.gb.action[idx] = attack_action_id
                 # group_actions.append(target+6)
             else:
                 # out of attack range, move towards the target
