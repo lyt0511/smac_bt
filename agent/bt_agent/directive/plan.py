@@ -5,6 +5,9 @@ import numpy as np
 from agent.bt_agent.directive.node import register_gb_keys, init_gb_keys, register_eb_keys, init_eb_keys
 from agent.bt_agent.team import task
 
+from agent.bt_agent.situation.ally import ally_situation
+from agent.bt_agent.situation.enemy import enemy_situation
+
 import pdb
 
 class Plan():
@@ -17,10 +20,20 @@ class Plan():
 
         self.update_bb()
 
-        self.init_var()
+        self.init_situation()
 
     def init_var(self):
+        self.situation = {
+            'ally': ally_situation(self.eb),
+            'enemy': enemy_situation(self.eb),
+        }
         self.last_agent_hpsp = [0] * self.args.n_agents
+    
+    ### update situation obs and list
+    def update_situation(self, obs):
+        for _, situation in self.situation.items():
+            situation.update_obs(obs)
+            situation.update_situation_list()
     
     def create_bb(self):
         self.bb = py_trees.blackboard.Client(namespace=self.namespace)
@@ -67,6 +80,9 @@ class Plan():
 
         # update target
         self.update_ally_info()
+
+        # update situation
+        self.update_situation(obs)
 
         for team in self.team:
             team.step()
@@ -265,11 +281,14 @@ class Plan():
             else:                
                 hpsp = agent_obs[hp_id]
             
-            if self.last_agent_hpsp[i] - hpsp > 0:
-                self.gb.under_attack[i] = True
+            # if self.last_agent_hpsp[i] - hpsp > 0:
+            #     self.gb.under_attack[i] = True
 
-            # update the last agent hpsp
-            self.last_agent_hpsp[i] = hpsp
+            # # update the last agent hpsp
+            # self.last_agent_hpsp[i] = hpsp
+        
+            if self.situation['ally'].situation_list['ally_under_attack'][i]:
+                self.gb.under_attack[i] = True
 
 
             # pdb.set_trace() 
