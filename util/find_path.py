@@ -212,7 +212,6 @@ class Pathfinder:
     def path_to_action(self):
         path = self.path[::-1]
         pos = [(node.x, node.y) for node in path]
-        print (pos)
         action_queue = []
         prev = path[0]
         for cur in path[1:]:
