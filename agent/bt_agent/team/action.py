@@ -2,7 +2,7 @@ import py_trees
 import numpy as np
 from agent.bt_agent.team.node import Node
 from util.find_path import Map_grid
-from util.state_calc import calcPosList, calcEvadeDirection
+from util.state_calc import calcPosList, calcEvadeDirection, calcChaseDirection
 
 from agent.bt_agent.action.move import move_action
 from agent.bt_agent.action.attack import attack_action
@@ -147,6 +147,7 @@ class Attack(Node):
     def __init__(self, namespace):
         super().__init__(namespace)
         self.attack_action = attack_action()
+        self.move_action = move_action()
     
     def update(self):
         target = self.bb.target
@@ -154,37 +155,23 @@ class Attack(Node):
         avail_actions = self.gb.avail_actions
         state = self.gb.state
         attack_action_id = self.attack_action.attack_act_id(target)
+
+        # 求组内智能体向目标移动的方向
+        pos_x,pos_y,e_pos_x,e_pos_y = calcPosList(self.gb.state, self.bb.target,self.bb.group, self.eb.state_ally_feat_size, self.eb.state_ally_x_id, self.eb.state_ally_y_id, self.eb.n_agents, self.eb.state_enemy_feat_size, self.eb.state_enemy_x_id, self.eb.state_enemy_y_id)        
+        chase_direction = calcChaseDirection(pos_x,pos_y,e_pos_x,e_pos_y)
+
         for idx in self.bb.group:
+            # 对于组内每个智能体
+            # 目标在攻击范围内就攻击
             if avail_actions[idx][target+self.eb.none_attack_bits] == 1:
                 # attack target (id = target id + self.eb.none_attack_bits (noop stop n s e w))
                 self.gb.action[idx] = attack_action_id
                 # group_actions.append(target+6)
-            else:
-                # out of attack range, move towards the target
-                pos_x = state[idx*self.eb.state_ally_feat_size + self.eb.state_ally_x_id]
-                pos_y = state[idx*self.eb.state_ally_feat_size + self.eb.state_ally_y_id]
-                e_pos_x = state[self.eb.n_agents*self.eb.state_ally_feat_size+\
-                                    target*self.eb.state_enemy_feat_size+self.eb.state_enemy_x_id]
-                e_pos_y = state[self.eb.n_agents*self.eb.state_ally_feat_size+\
-                                    target*self.eb.state_enemy_feat_size+self.eb.state_enemy_y_id]
-                # delta_x value: positive - target at east, negative -  target at west
-                # delta_y value: positive - target at north, negative - target at south
-                delta_x = e_pos_x - pos_x 
-                delta_y = e_pos_y - pos_y
-                if abs(delta_x) > abs(delta_y):
-                    if delta_x < 0:
-                        self.gb.action[idx] = self.eb.move_west_id
-                        # group_actions.append(5)
-                    else:               
-                        self.gb.action[idx] = self.eb.move_east_id         
-                        # group_actions.append(4)
-                else:
-                    if delta_y < 0:
-                        self.gb.action[idx] = self.eb.move_south_id
-                        # group_actions.append(3)
-                    else:
-                        self.gb.action[idx] = self.eb.move_north_id                        
-                        # group_actions.append(2)
+                
+            # 目标不在攻击范围内就朝所在方向追击
+            else:               
+                move_action_id = self.move_action.move_act_id(chase_direction[idx])
+                self.gb.action[idx] = move_action_id
 
         return py_trees.common.Status.SUCCESS
 
