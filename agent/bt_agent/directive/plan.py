@@ -22,7 +22,7 @@ class Plan():
 
         self.init_situation()
 
-    def init_var(self):
+    def init_situation(self):
         self.situation = {
             'ally': ally_situation(self.eb),
             'enemy': enemy_situation(self.eb),
@@ -275,11 +275,11 @@ class Plan():
 
         for i, agent_obs in enumerate(obs):
             # get agents' hp + sp(shield if exists)
-            hpsp = 0
-            if self.eb.shield_bits_ally > 0:
-                hpsp = agent_obs[hp_id] + agent_obs[sp_id]
-            else:                
-                hpsp = agent_obs[hp_id]
+            # hpsp = 0
+            # if self.eb.shield_bits_ally > 0:
+            #     hpsp = agent_obs[hp_id] + agent_obs[sp_id]
+            # else:                
+            #     hpsp = agent_obs[hp_id]
             
             # if self.last_agent_hpsp[i] - hpsp > 0:
             #     self.gb.under_attack[i] = True
