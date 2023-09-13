@@ -8,7 +8,7 @@ from agent.bt_agent.action.move import move_action
 from agent.bt_agent.action.attack import attack_action
 
 from agent.bt_agent.skill.escape import escape_skill
-from agent.bt_agent.skill.kite import kite_skill
+from agent.bt_agent.skill.kite import kite_skill_semiauto
 
 import pdb
 
@@ -22,6 +22,7 @@ class Move(Node):
         move_action_id = self.move_action.move_act_id(move_direction)
         avail_actions = self.gb.avail_actions
         group_actions = []
+        state = self.gb.state     
         for idx in self.bb.group:
             if avail_actions[idx][move_action_id] == 1:
                 # move to direction
@@ -240,7 +241,7 @@ class Escape(Node):
 class Kite(Node):
     def __init__(self, namespace):
         super().__init__(namespace)
-        self.kite_skill = kite_skill()
+        self.kite_skill = kite_skill_semiauto()
 
     def update(self):        
         target = self.bb.target
