@@ -170,8 +170,9 @@ class Attack(Node):
                 # group_actions.append(target+6)
                 
             # 目标不在攻击范围内就朝所在方向追击
-            else:               
-                move_action_id = self.move_action.move_act_id(chase_direction[idx])
+            else:     
+                # Todo: calcChaseDirection算多个agent的方向          
+                move_action_id = self.move_action.move_act_id(chase_direction[0])
                 self.gb.action[idx] = move_action_id
 
         return py_trees.common.Status.SUCCESS
