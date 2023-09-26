@@ -133,9 +133,9 @@ class Plan():
         self.eb.state_ally_x_id = 2
         self.eb.state_ally_y_id = 3
         # enemy - (hp,x,y,shield,unitype)
-        self.eb.state_enemy_feat_size = 3 + self.args.shield_bits_enemy + self.args.unit_type_bits
-        self.eb.state_enemy_x_id = 1
-        self.eb.state_enemy_y_id = 2        
+        self.eb.state_enemy_feat_size = 4 + self.args.shield_bits_enemy + self.args.unit_type_bits
+        self.eb.state_enemy_x_id = 2
+        self.eb.state_enemy_y_id = 3        
 
         self.eb.none_attack_bits = 6
         # action id
