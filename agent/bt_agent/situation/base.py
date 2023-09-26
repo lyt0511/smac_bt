@@ -11,7 +11,12 @@ class base_situation:
         # 注意态势仅是进一步加工，而不是全加工，即攻击敌人长手单位攻击血量低的而短手单位攻击距离近的，态势仅提供远近和血量列表，怎么选择智能体不由态势管
         self.situation = {}
         self.obs = None
+        self.state = None
     
     def update_obs(self, obs):
         self.obs = obs
+        return
+
+    def update_state(self, state):
+        self.state = state
         return

@@ -5,13 +5,25 @@ class ally_situation(base_situation):
         super().__init__(environment_args)
         self.obs = None
         self.situation_list = {
+            'ally_alive_num': 0,
             'ally_last_hpsp': [[] for i in range(self.eb.n_agents)],
             'ally_under_attack': [False for i in range(self.eb.n_agents)],            
         }
-    
+
     def update_situation_list(self):
+        self.update_ally_alive_num()
         self.update_ally_under_attack()
     
+    def update_ally_alive_num(self):
+        idx_ally_hp = [self.eb.state_ally_feat_size*i for i in range(self.eb.n_agents)]
+        ally_hp_list = self.state[idx_ally_hp]
+        ally_alive_count = 0
+        for hp in ally_hp_list:
+            if hp != 0:
+                ally_alive_count += 1
+        self.situation_list['ally_alive_num'] = ally_alive_count
+
+
     def update_ally_under_attack(self):
         # get the nearest enemy (Todo: get all enemies?)
         hp_id = self.eb.obs_agent_hp_id

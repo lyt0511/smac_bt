@@ -30,9 +30,10 @@ class Plan():
         self.last_agent_hpsp = [0] * self.args.n_agents
     
     ### update situation obs and list
-    def update_situation(self, obs):
+    def update_situation(self, obs, state):
         for _, situation in self.situation.items():
             situation.update_obs(obs)
+            situation.update_state(state)
             situation.update_situation_list()
     
     def create_bb(self):
@@ -60,13 +61,14 @@ class Plan():
 
         # simple assignment for 2s3z, 2 long 3 short
         self.team = []
-        self.team += [task.Team(i, 'long') for i in range(2)]
-        self.team += [task.Team(i, 'short') for i in range(2, 5)]
+        self.team += [task.Team(i, 'Stalker') for i in range(2)]
+        self.team += [task.Team(i, 'Zeolots') for i in range(2, 5)]
 
     def update_ally_info(self):
-        self.update_attack_target()
+        # self.update_attack_target()
         self.update_visible_target()
         self.update_ally_under_attack()
+        self.gb.situation = self.situation
     
     def step(self, state, obs, avail_actions):
         # self.update_group()
@@ -82,7 +84,7 @@ class Plan():
         self.update_ally_info()
 
         # update situation
-        self.update_situation(obs)
+        self.update_situation(obs, state)
 
         for team in self.team:
             team.step()
