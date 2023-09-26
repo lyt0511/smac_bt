@@ -10,6 +10,7 @@ def register_gb_keys(self):
     self.gb.register_key('kite_hp', access=py_trees.common.Access.WRITE)
     self.gb.register_key('under_attack', access=py_trees.common.Access.WRITE)
     self.gb.register_key('move_id', access=py_trees.common.Access.WRITE)
+    self.gb.register_key('situation', access=py_trees.common.Access.WRITE)
 
 def init_gb_keys(self):
     self.gb.obs = []
@@ -21,6 +22,7 @@ def init_gb_keys(self):
     self.gb.kite_hp = 0
     self.gb.under_attack = []
     self.gb.move_id = {}
+    self.gb.situation = None
 
 def register_eb_keys(self):
     self.eb.register_key('n_agents', access=py_trees.common.Access.WRITE)

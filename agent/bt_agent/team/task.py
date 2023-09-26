@@ -22,7 +22,7 @@ class Team():
         init_keys(self)
 
     def create_tree(self, unit_mode):
-        if unit_mode == 'long':
+        if unit_mode == 'Stalker':
             self.root = py_trees.composites.Selector(
                 children=[
                     py_trees.composites.Sequence(
@@ -84,6 +84,7 @@ class Team():
         # self.bb.group = list(filter(lambda k: k.identity_id in self.uid, self.en.units))
         member_id = self.gb.group_dict[self.flag_num]
         self.bb.group.append(member_id)
+        self.bb.agent_id = member_id
 
         return
 

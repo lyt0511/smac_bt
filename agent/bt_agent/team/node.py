@@ -3,6 +3,7 @@ import py_trees
 from agent.bt_agent.directive.node import register_gb_keys, register_eb_keys
 
 def register_keys(self):
+    self.bb.register_key('agent_id', access = py_trees.common.Access.WRITE)
     self.bb.register_key('group', access = py_trees.common.Access.WRITE)
     self.bb.register_key('target', access = py_trees.common.Access.WRITE)
     self.bb.register_key('target_visible', access = py_trees.common.Access.WRITE)
@@ -15,6 +16,7 @@ def register_keys(self):
     register_eb_keys(self)
 
 def init_keys(self):
+    self.bb.agent_id = -1
     self.bb.group = []
     self.bb.target = -1
     self.bb.target_visible = -1

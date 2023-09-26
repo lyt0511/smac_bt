@@ -144,7 +144,7 @@ class Move_Queue(Node):
         return py_trees.common.Status.SUCCESS
 
 
-class Attack(Node):
+class Attack_group(Node):
     def __init__(self, namespace):
         super().__init__(namespace)
         self.attack_action = attack_action()
@@ -170,9 +170,43 @@ class Attack(Node):
                 # group_actions.append(target+6)
                 
             # 目标不在攻击范围内就朝所在方向追击
-            else:               
-                move_action_id = self.move_action.move_act_id(chase_direction[idx])
-                self.gb.action[idx] = move_action_id
+            else:              
+               # Todo: chase目前还有些bug，calcChaseDirection函数目前指算了一个agent的方向
+               move_action_id = self.move_action.move_act_id(chase_direction[0])
+               self.gb.action[idx] = move_action_id
+
+        return py_trees.common.Status.SUCCESS
+
+class Attack(Node):
+    def __init__(self, namespace):
+        super().__init__(namespace)
+        self.attack_action = attack_action()
+        self.move_action = move_action()
+        self.agent_id = self.bb.agent_id
+    
+    def update(self):        
+        # Stalker attack the enemy with lowest hpsp
+        ### Todo： 集火攻击功能，需要依托于协同管理器的实现
+        # if int(enemy_alive_num) == 5:
+        #     target = self.first_attack_agent
+        ###
+
+        ### if the live ally number larger thant alive enemy number, attack high value enemy
+        #if enemy_alive_num < ally_alive_num:
+        #    for j, _ in pfv[i]:
+        #        if enemy_canatt[j] == 1:
+        #            self.team[i].bb.target = j
+        #            break
+        ### if not, attack enemy with lower hp to kill one enemy first
+        # else:
+        # for j, _ in ho[self.agent_id]:
+        #     if avail_actions[self.agent_id][j+self.eb.none_attack_bits] == 1:
+        #         target = j
+        #         break
+        # self.first_attack_agent = random.randint(2,4)
+
+        attack_action_id = self.attack_action.attack_act_id(self.bb.target)
+        self.gb.action[self.agent_id] = attack_action_id
 
         return py_trees.common.Status.SUCCESS
 
@@ -263,7 +297,7 @@ class Kite(Node):
 
                     self.kite_skill.change()
                     self.kite_skill.fill(direction=kite_direction)
-                    self.gb.action[idx] = self.execute()
+                    self.gb.action[idx] = self.kite_skill.execute()
             else:
                 # out of attack range, stop (Todo: better move strategy)
                 self.gb.action[idx] = self.eb.stop_id

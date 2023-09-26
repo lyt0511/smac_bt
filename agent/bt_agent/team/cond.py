@@ -69,22 +69,47 @@ class CanAttack(Node):
     def __init__(self, namespace, unit_mode):
         super().__init__(namespace)
         self.unit_mode = unit_mode
+        self.agent_id = self.bb.agent_id
 
     def update(self):
         state = self.gb.state
         # agent dead
-        for idx in self.bb.group:
-            if state[idx*self.eb.state_ally_feat_size] == 0:
-                return py_trees.common.Status.FAILURE
+        # for idx in self.bb.group:
+        #     if state[idx*self.eb.state_ally_feat_size] == 0:
+        #         return py_trees.common.Status.FAILURE
+        
+        if state[self.agent_id*self.eb.state_ally_feat_size] == 0:
+            return py_trees.common.Status.FAILURE
 
-        # only long-hand agent needs to kite
-        if self.unit_mode == 'long':
+        ### kite calc (Zeolots does not need to kite)
+        if self.unit_mode == 'Stalker':
             for idx in self.bb.group:
                 # hp < kite_hp then judge whether to kite
                 # print ('{} agent hp: {}'.format(idx, state[idx*self.eb.state_ally_feat_size]))
                 if state[idx*self.eb.state_ally_feat_size] < self.gb.kite_hp:                
                     if self.bb.kite_action_type != 'move':
                         return py_trees.common.Status.FAILURE
+
+        ### attack target calc        
+        # target id calc
+        # base info calc  
+        avail_actions = self.gb.avail_actions      
+        dis = self.gb.situation['enemy'].situation_list['enemy_dis_sort']
+        ho = self.gb.situation['enemy'].situation_list['enemy_hpsp_sort']
+        pfv = self.gb.situation['enemy'].situation_list['enemy_pfv_sort']
+        ally_alive_num = self.gb.situation['ally'].situation_list['ally_alive_num']
+        enemy_alive_num = self.gb.situation['enemy'].situation_list['enemy_alive_num']
+
+        if self.unit_mode == 'Stalker': 
+            for j, _ in ho[self.agent_id]:
+                if avail_actions[self.agent_id][j+self.eb.none_attack_bits] == 1:
+                    self.bb.target = j
+                    break   
+        elif self.unit_mode == 'Zeolots':             
+            for j, _ in dis[self.agent_id]:
+                if avail_actions[self.agent_id][j+self.eb.none_attack_bits] == 1:
+                    self.bb.target = j
+                    break
         
         if self.bb.target != -1:
             # refer to kite action, set the kite action type to attack
@@ -97,23 +122,35 @@ class CanAttack(Node):
 class CanMove(Node):
     def __init__(self, namespace):
         super().__init__(namespace)
+        self.agent_id = self.bb.agent_id
     
     def update(self):
-        # canmove = ! (can attack || can kite)
-        if self.bb.target != -1:
+        ### canmove = ! (can attack || can kite)
+
+        ### any attack target for failure
+        # get enemies' canAttack, distance
+        agent_obs = self.gb.obs[self.agent_id]
+        idx_bases = [self.eb.move_feat_size + idx_enemy * self.eb.obs_ally_feat_size \
+                                            for idx_enemy in range(self.eb.n_agents)]
+        canatt_idx = [idx_base for idx_base in idx_bases]
+        enemy_canatt = agent_obs[canatt_idx]
+
+        # if enemy_canatt is empty, ith team's target must be set to -1
+        # (otherwise previous attack target exists even if it out of range in the following steps)
+        if enemy_canatt.sum() != 0:
+            # self.bb.target = -1
             return py_trees.common.Status.FAILURE
         
         state = self.gb.state
-        # agent dead
-        for idx in self.bb.group:
-            if state[idx*self.eb.state_ally_feat_size] == 0:
-                return py_trees.common.Status.FAILURE
+        ### agent dead for failure
+        if state[self.agent_id*self.eb.state_ally_feat_size] == 0:
+            return py_trees.common.Status.FAILURE
 
         # for idx in self.bb.group:
         #     if state[idx*self.eb.state_ally_feat_size] < self.gb.evade_hp:
         #         return py_trees.common.Status.FAILURE
 
-        # defatul move to east
+        # defatul move to west
         self.bb.move_direction = 'e'
 
         return py_trees.common.Status.SUCCESS
