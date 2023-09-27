@@ -87,6 +87,7 @@ class Plan():
         self.update_situation(obs, state)
 
         for team in self.team:
+            team.bb.target = -1
             team.step()
         
         # transform action dict to action list
