@@ -145,4 +145,22 @@ class CanMove(Node):
         self.bb.move_direction = 'e'
 
         return py_trees.common.Status.SUCCESS
+
+
+class CanMoveQueue(Node):
+    def __init__(self, namespace):
+        super().__init__(namespace)
+        self.agent_id = self.bb.agent_id
+        self.bb.move_queue_target_pos = (0.8,0.2)
+    
+    def update(self):
         
+        state = self.gb.state
+        ### agent dead for failure
+        if state[self.agent_id*self.eb.state_ally_feat_size] == 0:
+            return py_trees.common.Status.FAILURE
+
+        # set target position for move queue 
+        # self.bb.move_queue_target_pos = (0.3,0.2)
+
+        return py_trees.common.Status.SUCCESS   

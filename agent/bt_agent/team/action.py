@@ -58,9 +58,10 @@ class Move(Node):
 
         return py_trees.common.Status.SUCCESS
 
-class Move_Queue(Node):
+class Move_Queue_Group(Node):
     def __init__(self, namespace):
         super().__init__(namespace)
+        self.agent_id = self.bb.agent_id
         self.target_pos = (0,0)
         self.action_queue = []
         self.action_pt = []
@@ -142,6 +143,94 @@ class Move_Queue(Node):
             self.action_finish[i] = False   
 
         return py_trees.common.Status.SUCCESS
+
+
+class Move_Queue(Node):
+    def __init__(self, namespace):
+        super().__init__(namespace)
+        self.bb.in_move_queue = False
+
+        self.agent_id = self.bb.agent_id
+        self.target_pos = (0,0)
+        self.action_queue = []
+        self.action_pt = -1
+        # self.action_finish = []
+
+        map_width = self.eb.map_width
+        map_height = self.eb.map_height
+        self.map_grid = Map_grid(map_width, map_height)
+
+    def update(self):
+        avail_actions = self.gb.avail_actions
+
+        if self.bb.in_move_queue == False:
+            self.action_queue = []
+            self.action_pt = -1
+            self.map_grid.path_finder.reset_color_and_path(self.map_grid.grid)
+            print('path finder reset')
+            self.target_pos = self.bb.move_queue_target_pos
+
+        # judge if pointer reach the aciont queue rear
+        def reach_action_rear(self, act_q, pt):
+            # reach rear then reset action queue and pointer
+            if pt == len(act_q):
+                self.action_queue = []
+                self.action_pt = -1
+                self.bb.in_move_queue = False
+                self.map_grid.path_finder.reset_color_and_path(self.map_grid.grid)
+
+        def calc_move_pos_actions(src_pos, tar_pos):
+            # version 1: A* 算法计算两个坐标之间的路径和动作
+            # state中的坐标是经过处理的相对坐标，所以要反处理
+            center_pos_x = self.eb.map_width / 2
+            center_pos_y = self.eb.map_height / 2
+
+            src_x = int(src_pos[0] * self.eb.area_width + center_pos_x)
+            src_y = int(src_pos[1] * self.eb.area_height + center_pos_y)
+            tar_x = int(tar_pos[0] * self.eb.area_width)
+            tar_y = int(tar_pos[1] * self.eb.area_height)
+
+            print (src_x, src_y, tar_x, tar_y)
+
+            return self.map_grid.path_finder.find_path(self.map_grid.grid, src_x, src_y, tar_x, tar_y)
+
+        state = self.gb.state
+        # for i, idx in enumerate(self.bb.group):
+        # if self.action_finish[i]:
+        #     self.gb.action[idx] = self.eb.stop_id
+        #     continue 
+
+        pos_x = state[self.agent_id*self.eb.state_ally_feat_size + self.eb.state_ally_x_id]
+        pos_y = state[self.agent_id*self.eb.state_ally_feat_size + self.eb.state_ally_y_id]
+
+        if self.action_pt == -1:
+            # calc pos actions and step the first action
+            agent_pos = (pos_x, pos_y)
+            self.action_queue = calc_move_pos_actions(agent_pos, self.target_pos)
+            self.bb.in_move_queue = True
+
+            print (self.action_queue)
+            self.action_pt += 1
+
+            self.gb.action[self.agent_id] = self.action_queue[self.action_pt]
+            self.action_pt += 1
+
+            # only one action in action queue then reset action queue and pointer
+            reach_action_rear(self, self.action_queue, self.action_pt)
+        else:
+            # step following actions, if reach at the last aciton then reset action queue and pointer
+            self.gb.action[self.agent_id] = self.action_queue[self.action_pt]
+            self.action_pt += 1                    
+            
+            reach_action_rear(self, self.action_queue, self.action_pt)
+
+        # any agent not finish, node running   
+        # if self.bb.in_move_queue == True:
+        #     return py_trees.common.Status.SUCCESS  
+        
+        
+        return py_trees.common.Status.SUCCESS  
+
 
 
 class Attack_group(Node):

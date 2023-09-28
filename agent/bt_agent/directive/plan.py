@@ -162,9 +162,6 @@ class Plan():
             'N': self.eb.stop_id
         }
 
-        for i in range(self.eb.n_agents):
-            self.team[i].bb.move_queue_target_pos = [0.1,0.9]
-
     def update_attack_target(self):
         # get the nearest enemy (Todo: get all enemies?)
         obs = self.gb.obs
