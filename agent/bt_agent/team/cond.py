@@ -128,18 +128,9 @@ class CanMove(Node):
         ### canmove = ! (can attack || can kite)
 
         ### any attack target for failure
-        # get enemies' canAttack, distance
-        agent_obs = self.gb.obs[self.agent_id]
-        idx_bases = [self.eb.move_feat_size + idx_enemy * self.eb.obs_ally_feat_size \
-                                            for idx_enemy in range(self.eb.n_agents)]
-        canatt_idx = [idx_base for idx_base in idx_bases]
-        enemy_canatt = agent_obs[canatt_idx]
-
-        # if enemy_canatt is empty, ith team's target must be set to -1
-        # (otherwise previous attack target exists even if it out of range in the following steps)
-        if enemy_canatt.sum() != 0:
-            # self.bb.target = -1
-            return py_trees.common.Status.FAILURE
+        # !!!!之前的这里错了，这里的canatt_idx是可以看见而不是可以攻击到
+        # 实际上并不需要在move中判断是否还能有攻击的对象，因为在前置的attack已经判断过，
+        # attack failure自然意味着move中这个判断不可能为true
         
         state = self.gb.state
         ### agent dead for failure
