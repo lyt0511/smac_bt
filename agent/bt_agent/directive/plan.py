@@ -30,10 +30,11 @@ class Plan():
         self.last_agent_hpsp = [0] * self.args.n_agents
     
     ### update situation obs and list
-    def update_situation(self, obs, state):
+    def update_situation(self, obs, state, avail_actions):
         for _, situation in self.situation.items():
             situation.update_obs(obs)
             situation.update_state(state)
+            situation.update_avail_action(avail_actions)
             situation.update_situation_list()
     
     def create_bb(self):
@@ -84,7 +85,7 @@ class Plan():
         self.update_ally_info()
 
         # update situation
-        self.update_situation(obs, state)
+        self.update_situation(obs, state, avail_actions)
 
         for team in self.team:
             team.bb.target = -1
@@ -161,9 +162,6 @@ class Plan():
             's': self.eb.move_south_id,
             'N': self.eb.stop_id
         }
-
-        for i in range(self.eb.n_agents):
-            self.team[i].bb.move_queue_target_pos = [0.1,0.9]
 
     def update_attack_target(self):
         # get the nearest enemy (Todo: get all enemies?)

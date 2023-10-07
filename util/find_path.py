@@ -25,6 +25,11 @@ class Map_grid:
                 self.grid[row].append(node)  # Append a cell
         self.path_finder.update_neighbors(self.grid)
 
+    # def reset(self):
+    #     self.path_finder = Pathfinder(self.row, self.col)
+    #     self.path_finder.update_neighbors(self.grid)
+
+
     def passable_setting(self):
         # randomly set a percentage of the tiles to be walls
         for row in range(self.row):
@@ -99,11 +104,11 @@ class Node:
         else:
             self.neighbor = [neighbor]
 
-    def clear_node():
-        fscore = 0
-        gscore = 0
-        hscore = 0
-        parent = None
+    def clear_node(self):
+        self.fscore = 0
+        self.gscore = 0
+        self.hscore = 0
+        self.parent = None
 
 
 class Pathfinder:
@@ -127,13 +132,15 @@ class Pathfinder:
         self.path = []
         for row in range(self.rows):
             for column in range(self.cols):
-                grid[row][column].clear_node
+                grid[row][column].clear_node()
                 # if grid[row][column].color == 'grey':
                 #     grid[row][column].passable = False
 
     def find_path(self, grid, start_x, start_y, end_x, end_y):
         start_point = grid[start_x][start_y]
         end_point = grid[end_x][end_y]
+        print (start_point.x, start_point.y)
+        print (end_point.x, end_point.y)
 
         self.openlist[start_point] = 0
 

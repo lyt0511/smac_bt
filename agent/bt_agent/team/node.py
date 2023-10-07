@@ -8,6 +8,7 @@ def register_keys(self):
     self.bb.register_key('target', access = py_trees.common.Access.WRITE)
     self.bb.register_key('target_visible', access = py_trees.common.Access.WRITE)
     self.bb.register_key('move_direction', access = py_trees.common.Access.WRITE)
+    self.bb.register_key('in_move_queue', access = py_trees.common.Access.WRITE)
     self.bb.register_key('move_queue_target_pos', access = py_trees.common.Access.WRITE)
     self.bb.register_key('kite_action_type', access = py_trees.common.Access.WRITE)
     self.bb.register_key('target_visible_center_pos', access = py_trees.common.Access.WRITE)
@@ -21,6 +22,7 @@ def init_keys(self):
     self.bb.target = -1
     self.bb.target_visible = -1
     self.bb.move_direction = 'N'
+    self.bb.in_move_queue = False
     self.bb.move_queue_target_pos = []
     self.bb.kite_action_type = 'attack'
     self.bb.target_visible_center_pos = []

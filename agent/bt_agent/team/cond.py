@@ -128,7 +128,7 @@ class CanMove(Node):
         ### canmove = ! (can attack || can kite)
 
         ### any attack target for failure
-        # !!!!之前的这里错了，这里的canatt_idx是可以看见而不是可以攻击到
+        # !!!! canatt这里错了，这里的canatt_idx是可以看见而不是可以攻击到
         # 实际上并不需要在move中判断是否还能有攻击的对象，因为在前置的attack已经判断过，
         # attack failure自然意味着move中这个判断不可能为true
         
@@ -145,4 +145,22 @@ class CanMove(Node):
         self.bb.move_direction = 'e'
 
         return py_trees.common.Status.SUCCESS
+
+
+class CanMoveQueue(Node):
+    def __init__(self, namespace):
+        super().__init__(namespace)
+        self.agent_id = self.bb.agent_id
+        self.bb.move_queue_target_pos = (0.8,0.2)
+    
+    def update(self):
         
+        state = self.gb.state
+        ### agent dead for failure
+        if state[self.agent_id*self.eb.state_ally_feat_size] == 0:
+            return py_trees.common.Status.FAILURE
+
+        # set target position for move queue 
+        # self.bb.move_queue_target_pos = (0.3,0.2)
+
+        return py_trees.common.Status.SUCCESS   
