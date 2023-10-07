@@ -7,15 +7,17 @@ class enemy_situation(base_situation):
         ### 1. create situation term
         self.situation_list = {
             'enemy_alive_num': 0,
-            'enemy_visible': [[] for i in range(self.eb.n_agents)],
-            'enemy_dis_sort': [[] for i in range(self.eb.n_agents)],
-            'enemy_hpsp_sort': [[] for i in range(self.eb.n_agents)],
-            'enemy_pfv_sort': [[] for i in range(self.eb.n_agents)],
+            'enemy_pos': [(0,0) for i in range(self.eb.n_enemies)],
+            'enemy_visible': [[] for i in range(self.eb.n_enemies)],
+            'enemy_dis_sort': [[] for i in range(self.eb.n_enemies)],
+            'enemy_hpsp_sort': [[] for i in range(self.eb.n_enemies)],
+            'enemy_pfv_sort': [[] for i in range(self.eb.n_enemies)],
         }
 
     ### 2. create situation update function
     def update_situation_list(self):
         self.update_enemy_alive_number()
+        self.update_enemy_position()
         self.update_enemy_dis_sort_list()
         self.update_enemy_hpsp_sort_list()
         # self.update_enemy_visible_list()
@@ -31,6 +33,14 @@ class enemy_situation(base_situation):
             if hp != 0:
                 enemy_alive_count += 1
         self.situation_list['enemy_alive_num'] = enemy_alive_count
+
+    def update_enemy_position(self):
+        for i in range(self.eb.n_enemies):
+            pos_x = self.state[self.eb.n_agents*self.eb.state_ally_feat_size+\
+                                i*self.eb.state_enemy_feat_size+self.eb.state_enemy_x_id]
+            pos_y = self.state[self.eb.n_agents*self.eb.state_ally_feat_size+\
+                                i*self.eb.state_enemy_feat_size+self.eb.state_enemy_y_id]
+            self.situation_list['enemy_pos'][i] = (pos_x, pos_y)
 
 
     def update_enemy_visible_list(self):

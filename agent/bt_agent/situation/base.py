@@ -12,11 +12,16 @@ class base_situation:
         self.situation = {}
         self.obs = None
         self.state = None
-    
+        self.avail_actions = None
+
     def update_obs(self, obs):
         self.obs = obs
         return
 
     def update_state(self, state):
         self.state = state
+        return
+    
+    def update_avail_action(self, avail_actions):
+        self.avail_actions = avail_actions
         return
